@@ -6,6 +6,10 @@ import (
 	"strings"
 )
 
+var (
+	alphabet = []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
+)
+
 func main() {
 	fmt.Println("answer to part 1 is: ", part1("day3.txt"))
 
@@ -36,7 +40,7 @@ func part1(input string) int {
 			if strings.Contains(secondHalf, string(char)) {
 				// find the char in the priority map and print it
 				// add the char to the sum
-				sum += priority[string(char)]
+				sum += getPriority(string(char))
 				break
 			}
 		}
@@ -52,14 +56,12 @@ func part2(input string) int {
 
 	// split the input into a slice of strings
 	lines := strings.Split(string(i), "\n")
-	// fmt.Println(lines[0])
 
 	// for each line split the line in half and store in a slice
 	var sum int
 	for l := 0; l < len(lines)-3; l += 3 {
 		// find the intersection of the three elves
-		// intersection := intersection(lines[l], lines[l+1], lines[l+2])
-		sum += priority[intersection(lines[l], lines[l+1], lines[l+2])]
+		sum += getPriority(intersection(lines[l], lines[l+1], lines[l+2]))
 	}
 	return sum
 }
@@ -73,60 +75,11 @@ func intersection(elf1, elf2, elf3 string) string {
 	return ""
 }
 
-// define priority of the items in the input
-var (
-	priority = map[string]int{
-		"a": 1,
-		"b": 2,
-		"c": 3,
-		"d": 4,
-		"e": 5,
-		"f": 6,
-		"g": 7,
-		"h": 8,
-		"i": 9,
-		"j": 10,
-		"k": 11,
-		"l": 12,
-		"m": 13,
-		"n": 14,
-		"o": 15,
-		"p": 16,
-		"q": 17,
-		"r": 18,
-		"s": 19,
-		"t": 20,
-		"u": 21,
-		"v": 22,
-		"w": 23,
-		"x": 24,
-		"y": 25,
-		"z": 26,
-		"A": 27,
-		"B": 28,
-		"C": 29,
-		"D": 30,
-		"E": 31,
-		"F": 32,
-		"G": 33,
-		"H": 34,
-		"I": 35,
-		"J": 36,
-		"K": 37,
-		"L": 38,
-		"M": 39,
-		"N": 40,
-		"O": 41,
-		"P": 42,
-		"Q": 43,
-		"R": 44,
-		"S": 45,
-		"T": 46,
-		"U": 47,
-		"V": 48,
-		"W": 49,
-		"X": 50,
-		"Y": 51,
-		"Z": 52,
+func getPriority(character string) int {
+	for i, char := range alphabet {
+		if char == character {
+			return i + 1
+		}
 	}
-)
+	return 0
+}

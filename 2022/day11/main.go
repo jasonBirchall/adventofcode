@@ -2,7 +2,6 @@ package main
 
 import (
 	_ "embed"
-	"fmt"
 	"sort"
 	"strconv"
 	"strings"
@@ -41,44 +40,27 @@ func part1(input string) int {
 	for _, monkey := range observation {
 		monkeySet = append(monkeySet, newMonkey(monkey))
 	}
-	fmt.Println(monkeySet)
 
 	for i := 1; i <= 20; i++ {
-		fmt.Println("Round", i)
-		fmt.Println("----")
 		for j := range monkeySet {
 			inspectedMonkey := &monkeySet[j]
-			fmt.Println("Monkey", inspectedMonkey.id, ":", inspectedMonkey.items.startingItems)
 			for _, item := range inspectedMonkey.items.startingItems {
-				fmt.Println("	Monkey inspects an item with a worry level of", item)
 				new := inspectedMonkey.operator(item)
-				fmt.Println("		Worry level increases to", new)
 				// After each monkey inspects an item but before it tests your worry level, your relief that the monkey's inspection didn't damage the item causes your worry level to be divided by three and rounded down to the nearest integer.
 				new = new / 3
-				fmt.Println("		Monkey gets bored with item. Worry level is now:", new)
 				if new%inspectedMonkey.test.divisableBy == 0 {
-					fmt.Println("		Current worry level is divisible by", inspectedMonkey.test.divisableBy, "so monkey", inspectedMonkey.id, "sends item to monkey", inspectedMonkey.test.trueReceiver)
 					monkeySet[inspectedMonkey.test.trueReceiver].items.startingItems = append(monkeySet[inspectedMonkey.test.trueReceiver].items.startingItems, new)
-					fmt.Println("		monkey:", monkeySet[inspectedMonkey.test.trueReceiver].id, "now has items:", monkeySet[inspectedMonkey.test.trueReceiver].items.startingItems)
 				} else {
-					fmt.Println("		Current worry level is not divisible by", inspectedMonkey.test.divisableBy, "so monkey", inspectedMonkey.id, "sends item to monkey", inspectedMonkey.test.falseReceiver)
 					monkeySet[inspectedMonkey.test.falseReceiver].items.startingItems = append(monkeySet[inspectedMonkey.test.falseReceiver].items.startingItems, new)
-					fmt.Println("		monkey:", monkeySet[inspectedMonkey.test.falseReceiver].id, "now has items:", monkeySet[inspectedMonkey.test.falseReceiver].items.startingItems)
 				}
 				_, inspectedMonkey.items.startingItems = inspectedMonkey.items.startingItems[len(inspectedMonkey.items.startingItems)-1], inspectedMonkey.items.startingItems[:len(inspectedMonkey.items.startingItems)-1]
-				fmt.Println("	monkey:", inspectedMonkey.id, "now has items:", inspectedMonkey.items.startingItems)
 				inspectedMonkey.items.total++
 			}
 		}
 	}
-	fmt.Println("After round 1, the monkeys are holding items with worry levels of")
 	var totalPasses []int
 	for _, monkey := range monkeySet {
-		fmt.Println("	monkey", monkey.id, ":", monkey.items.startingItems)
 		totalPasses = append(totalPasses, monkey.items.total)
-	}
-	for _, monkey := range monkeySet {
-		fmt.Println("	monkey", monkey.id, "inspected items", monkey.items.total, "times")
 	}
 
 	sort.IntSlice(totalPasses).Sort()
@@ -90,8 +72,11 @@ func part2(input string) int {
 	observation := strings.Split(strings.TrimSuffix(input, "\n"), "\n\n")
 
 	monkeySet := []monkey{}
+	bigMod := 1
 	for _, monkey := range observation {
-		monkeySet = append(monkeySet, newMonkey(monkey))
+		m := newMonkey(monkey)
+		bigMod *= m.test.divisableBy
+		monkeySet = append(monkeySet, m)
 	}
 
 	for i := 1; i <= 10000; i++ {
@@ -99,7 +84,7 @@ func part2(input string) int {
 			inspectedMonkey := &monkeySet[j]
 			for _, item := range inspectedMonkey.items.startingItems {
 				new := inspectedMonkey.operator(item)
-				// After each monkey inspects an item but before it tests your worry level, your relief that the monkey's inspection didn't damage the item causes your worry level to be divided by three and rounded down to the nearest integer.
+				new %= bigMod
 				if new%inspectedMonkey.test.divisableBy == 0 {
 					monkeySet[inspectedMonkey.test.trueReceiver].items.startingItems = append(monkeySet[inspectedMonkey.test.trueReceiver].items.startingItems, new)
 				} else {
@@ -112,17 +97,14 @@ func part2(input string) int {
 	}
 	var totalPasses []int
 	for _, monkey := range monkeySet {
-		fmt.Println("	monkey", monkey.id, ":", monkey.items.startingItems)
 		totalPasses = append(totalPasses, monkey.items.total)
-	}
-	for _, monkey := range monkeySet {
-		fmt.Println("	monkey", monkey.id, "inspected items", monkey.items.total, "times")
 	}
 
 	sort.IntSlice(totalPasses).Sort()
 
 	return totalPasses[len(totalPasses)-1] * totalPasses[len(totalPasses)-2]
 }
+
 func (m monkey) operator(item int) int {
 	operator := strings.Split(m.operation, " ")
 	if operator[1] == "old" {

@@ -44,6 +44,26 @@ def part1(input_file: str) -> int:
         return total
 
 
+def part2(input_file: str) -> int:
+    total_power = 0
+
+    with open(input_file, 'r') as f:
+        for line in f:
+            rounds = line.split(': ')[1].split(';')
+            min_cubes = {'red': 0, 'green': 0, 'blue': 0}
+
+            for round in rounds:
+                for cube in round.strip().split(','):
+                    number, color = cube.strip().split(' ')
+                    min_cubes[color] = max(min_cubes[color], int(number))
+
+            power = min_cubes['red'] * min_cubes['green'] * min_cubes['blue']
+            total_power += power
+
+    return total_power
+
+
 if __name__ == '__main__':
     print(part1('input.txt'))
+    print(part2('input.txt'))
 

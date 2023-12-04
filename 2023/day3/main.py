@@ -1,3 +1,4 @@
+from math import prod
 def create_matrix(input_path) -> list:
     with open(input_path, 'r') as f:
         lines = f.readlines()
@@ -44,6 +45,35 @@ def adjacent_to_symbol(matrix, x, y, length, rows, cols) -> bool:
 def is_symbol(char: str) -> bool:
     return char not in \
     ['.', ' ', '\n', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+
+
+def part2(matrix: list) -> int:
+    rows, cols = len(matrix), len(matrix[0])
+    total_gear_ratio = 0
+
+    def get_adjacent_numbers(x, y):
+        adjacent_numbers = set()  # Use a set to avoid duplicates
+        directions = [(dx, dy) for dx in [-1, 0, 1] for dy in [-1, 0, 1] if not (dx == 0 and dy == 0)]
+
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < rows and 0 <= ny < cols and is_num(matrix[nx][ny]):
+                number = matrix[nx][ny]
+                while ny + 1 < cols and is_num(matrix[nx][ny + 1]):
+                    ny += 1
+                    number += matrix[nx][ny]
+                adjacent_numbers.add(int(number))
+
+        return adjacent_numbers
+
+    for x in range(rows):
+        for y in range(cols):
+            if matrix[x][y] == '*':
+                adjacent_numbers = get_adjacent_numbers(x, y)
+                if len(adjacent_numbers) == 2:
+                    total_gear_ratio += prod(adjacent_numbers)
+
+    return total_gear_ratio
 
 if __name__ == "__main__":
     matrix = create_matrix("input.txt")

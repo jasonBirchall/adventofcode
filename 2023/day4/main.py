@@ -15,6 +15,20 @@ def part1(filename: str) -> int:
 
     return total_score
 
+
+
+def part2(filepath: str):
+    lines = open(filepath, 'r').readlines()
+    cards = [1] * len(lines)
+    for i, line in enumerate(lines):
+        x, y = map(str.split, line.split('|'))
+        n = len(set(x) & set(y))
+        for j in range(i + 1, min(i + 1 + n, len(lines))):
+            cards[j] += cards[i]
+    return sum(cards)
+
+  
 if __name__ == "__main__":
     print(part1("input.txt"))
+    print(part2("input.txt"))
 

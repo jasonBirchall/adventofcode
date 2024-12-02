@@ -1,13 +1,12 @@
-import re
+with open('test.txt', 'r', -1, 'utf') as f:
+    lines = f.read().splitlines()
 
 left = []
 right = []
-with open('input.txt', 'r', -1, 'utf') as f:
-    for line in f:
-        numbers = list(map(int, re.findall(r'\d+', line)))
-        left.append(numbers[0])
-        right.append(numbers[1])
-
+for line in lines:
+    l, r = line.split()
+    left.append(int(l))
+    right.append(int(r))
 left.sort()
 right.sort()
 

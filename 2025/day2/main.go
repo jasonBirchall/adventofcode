@@ -12,7 +12,31 @@ import (
 var input string
 
 func main() {
-	println("Part 1:", part1())
+	fmt.Println("Part 1:", part1())
+	fmt.Println("Part 2:", part2())
+}
+
+func part2() int {
+	ids := strings.Split(strings.TrimSpace(input), ",")
+
+	var sum int
+	for _, id := range ids {
+		// check for hyphen, e.g. number-number
+		if strings.Count(id, "-") != 1 {
+			fmt.Println("Invalid ID format:", id)
+		}
+		// seprate by hyphen
+		first, _ := strconv.Atoi(strings.SplitN(id, "-", 2)[0])
+		last, _ := strconv.Atoi(strings.SplitN(id, "-", 2)[1])
+
+		// validate the id, you can find the invalid IDs by looking
+		// for any ID which is made only of some sequence of digits repeated twice.
+		// So, 55 (5 twice), 6464 (64 twice), and 123123 (123 twice) would all be invalid IDs.
+		sum += isStillInvalidID(first, last)
+		// add the validated ids to the sum
+	}
+
+	return sum
 }
 
 func part1() int {
@@ -35,6 +59,48 @@ func part1() int {
 		// add the validated ids to the sum
 	}
 	return sum
+}
+
+func isStillInvalidID(first, last int) int {
+	sum := 0
+	a := makeRange(first, last)
+	for _, n := range a {
+		// also removes leading zeros
+		if check(n) {
+			sum += n
+		}
+	}
+	return sum
+}
+
+func check(n int) bool {
+	s := strconv.Itoa(n)
+	L := len(s)
+
+	// block size from 1 up to L/2 (if block > L/2, you can't have at least 2 repeats)
+	for blockSize := 1; blockSize <= L/2; blockSize++ {
+		if L%blockSize != 0 {
+			continue // can't tile string with this block size
+		}
+
+		block := s[:blockSize]
+		valid := true
+
+		// start from the second block
+		for i := blockSize; i < L; i += blockSize {
+			if s[i:i+blockSize] != block {
+				valid = false
+				break
+			}
+		}
+
+		if valid {
+			// we know there are at least 2 blocks because blockSize <= L/2
+			return true
+		}
+	}
+
+	return false
 }
 
 func isInvalidID(first int, last int) int {
